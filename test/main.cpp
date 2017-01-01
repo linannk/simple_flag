@@ -2,26 +2,33 @@
 #include "simple_flags.h"
 using namespace std;
 
-Define_bool(c, false, "Use compatible cpu instruction mode")
-Define_bool(O3, false, "Optimize level 3")
-Define_bool(SSE, false, "Use SSE instruction")
-Define_float(ratio, 0.0f, "Ratio")
-Define_float(radius, 0.0f, "Radius")
-Define_string(name, "", "name")
-Define_stringlist(set, "set-set")
-Define_stringlist(Wl, "Warning flag")
-Define_bool_ex(mode, false, "Extra mode")
-Define_bool_ex(no_defined, false, "")
+Define_bool(use_com, false, "Wheather to use com interface!!!")
+Define_int32(age, -1, "input your age")
+Define_float(radius, 0.0f, "radius")
+Define_string(name, "default", "name")
+Define_stringlist(set, "21312")
+
+Define_bool_ex(no_undefine, false, "")
+
+Define_bool_opt(--list-all-file, Flag_all, true, "")
 
 int main(int argc, char *argv[])
 {
     Flags::parse_args(argc, argv);
-	cout << "--mode: " << Flag_mode << std::endl;
-	cout << "--no_defined : " << Flag_no_defined << std::endl;
+	cout << Flag_use_com << std::endl;
+	cout << Flag_age << std::endl;
+	cout << "Radius : " << Flag_radius << std::endl;
+	cout << "Name : " << Flag_name << std::endl;
+	cout << "list_all_file: " << Flag_all << std::endl;
+	for (std::string& s : Flag_set) {
+		std::cout << s << std::endl;
+	}
     return 0;
 }
 
 
+
+//! Define_XXX
 
 //! Boolean
 //! -switch
@@ -48,3 +55,13 @@ int main(int argc, char *argv[])
 
 //! Flag_unknown_trash
 //!
+
+//! Define_XXX_ex
+//! Boolean
+//! --switch
+//! --switch 
+
+//! Self define opt, and flag
+//! Define_XXX_opt(opt, flag, def, comment)
+//! Define_bool_opt(--whole-time, FlagWholeTime, false, "Use the whole time?")
+//! cout << FlagWholeTime << std::endl;

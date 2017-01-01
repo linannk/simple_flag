@@ -53,7 +53,7 @@ INSTANTIATE_Flags_Register(flag_double)
 INSTANTIATE_Flags_Register(flag_string)
 INSTANTIATE_Flags_Register(flag_stringlist)
 
-inline bool is_false_key(const char* key)
+inline bool is_true_key(const char* key)
 {
     const char* true_keys[] = {
         "true" ,
@@ -61,7 +61,10 @@ inline bool is_false_key(const char* key)
         "TRUE" ,
         "on" ,
         "On" ,
-        "ON"
+        "ON" ,
+		"yes" ,
+		"Yes" ,
+		"YES"
     };
     for (int i = 0; i < sizeof(true_keys) / sizeof(char*); ++i)
     {
@@ -73,7 +76,7 @@ inline bool is_false_key(const char* key)
     return false;
 }
 
-inline bool is_true_key(const char* key)
+inline bool is_false_key(const char* key)
 {
     const char* false_keys[] = {
         "false" ,
@@ -81,7 +84,10 @@ inline bool is_true_key(const char* key)
         "FALSE" ,
         "off" ,
         "Off" ,
-        "OFF"
+        "OFF" ,
+		"no" ,
+		"No" ,
+		"NO"
     };
 
     for (int i = 0; i < sizeof(false_keys) / sizeof(char*); ++i)
@@ -209,7 +215,6 @@ int parse_args(int argc, char** argv)
 	int i = 1;
 	std::size_t pos = 0;
     while (i < argc) {
-		std::cout << "argv : " << argv[i] << std::endl;
 		j = i;
         if (0 == strcmp("--help", argv[i]))
         {
@@ -220,7 +225,6 @@ int parse_args(int argc, char** argv)
 
 		//! bool is special
 		for (auto iter = get_s_bool_Flags().begin(); iter != get_s_bool_Flags().end(); ++iter) {
-			std::cout << "opt : " << iter->opt << std::endl;
 			if (iter->opt == argv[i]) {
 				++iRet; ++i;
 				if (i < argc) {
@@ -300,10 +304,12 @@ int parse_args(int argc, char** argv)
 				while (*p != 0) {
 					Flags::flag_string tmp;
 					while (*p != 0) {
-						tmp.push_back(*p++);
 						if (*p == ',') {
 							++p;
 							break;
+						}
+						else {
+							tmp.push_back(*p++);
 						}
 					}
 					if (!tmp.empty()) {

@@ -37,6 +37,17 @@ END_FLAGS_NAMESPACES
 #define Declare_uint64(opt) extern FLAGS_NAMESPACE::flag_uint64 Flag_ ## opt;
 #define Declare_string(opt) extern FLAGS_NAMESPACE::flag_string Flag_ ## opt;
 #define Declare_stringlist(opt) extern FLAGS_NAMESPACE::flag_stringlist Flag_ ## opt;
+
+#define Declare_bool_opt(flag) extern FLAGS_NAMESPACE::flag_bool flag;
+#define Declare_float_opt(flag) extern FLAGS_NAMESPACE::flag_float flag;
+#define Declare_double_opt(flag) extern FLAGS_NAMESPACE::flag_double flag;
+#define Declare_int32_opt(flag) extern FLAGS_NAMESPACE::flag_int32 flag;
+#define Declare_uint32_opt(flag) extern FLAGS_NAMESPACE::flag_uint32 flag;
+#define Declare_int64_opt(flag) extern FLAGS_NAMESPACE::flag_int64 flag;
+#define Declare_uint64_opt(flag) extern FLAGS_NAMESPACE::flag_uint64 flag;
+#define Declare_string_opt(flag) extern FLAGS_NAMESPACE::flag_string flag;
+#define Declare_stringlist_opt(flag) extern FLAGS_NAMESPACE::flag_stringlist flag;
+
 #define Flag_Connect_Str(x, y) x ## y
 #define Flag_To_Str(x) #x
 
@@ -51,6 +62,19 @@ END_FLAGS_NAMESPACES
 	};                                                                                                                 \
 	static type ## _Flag_Register_ ## flag_prefix ## _ ## opt s_flag_## flag_prefix ## _ ## opt ## _object;            \
 	END_FLAGS_NAMESPACES
+
+#define Define_ImplementerOpt(type, opt, flag, def, comment)                                 \
+	FLAGS_NAMESPACE::type flag = def;                                                        \
+	BEGIN_FLAGS_NAMESPACES                                                                   \
+	class type ## _Flag_Register_ ## flag ## _ {                                             \
+	public:                                                                                  \
+		type ## _Flag_Register_ ## flag ## _() {                                             \
+			registerFlag<type>(Flag_To_Str(opt), &flag, comment);                            \
+		}                                                                                    \
+	};                                                                                       \
+	static type ## _Flag_Register_ ## flag ## _  type ## _Flag_Register_ ## flag ## _object; \
+	END_FLAGS_NAMESPACES
+
 
 #define Define_Implementer(type, opt, def, comment)                            \
     FLAGS_NAMESPACE::type Flag_ ## opt = def;                                  \
@@ -145,6 +169,39 @@ END_FLAGS_NAMESPACES
     };                                                                               \
 	static flag_stringlist ## _Flag_Register_ ## opt s_flag_ ## opt ## _object;      \
     END_FLAGS_NAMESPACES
+
+#define Define_bool_opt(opt, flag, def, comment) \
+	Define_ImplementerOpt(flag_bool, opt, flag, def, comment)
+
+#define Define_float_opt(opt, flag, def, comment) \
+	Define_ImplementerOpt(flag_float, opt, flag, def, comment)
+
+#define Define_double_opt(opt, flag, def, comment) \
+	Define_ImplementerOpt(flag_double, opt, flag, def, comment)
+
+#define Define_int32_opt(opt, flag, def, comment) \
+	Define_ImplementerOpt(flag_int32, opt, flag, def, comment)
+
+#define Define_uint32_opt(opt, flag, def, comment) \
+	Define_ImplementerOpt(flag_uint32, opt, flag, def, comment)
+
+#define Define_int64_opt(opt, flag, def, comment) \
+	Define_ImplementerOpt(flag_uint64, opt, flag, def, comment)
+
+#define Define_string_opt(opt, flag, def, comment) \
+	Define_ImplementerOpt(flag_uint64, opt, flag, def, comment)
+
+#define Define_stringlist_opt(opt, flag, comment)                                                                  \
+	FLAGS_NAMESPACE::flag_stringlist flag;                                                                         \
+	BEGIN_FLAGS_NAMESPACES                                                                                         \
+	class flag_stringlist ## _Flag_Register_ ## _ ## flag ## _ {                                                   \
+	public:                                                                                                        \
+		flag_stringlist ## _Flag_Register_ ## _ ## flag ## _() {                                                   \
+			registerFlag<type>(Flag_To_Str(opt), &flag, comment);                                                  \
+		}                                                                                                          \
+	};                                                                                                             \
+	static flag_stringlist ## _Flag_Register_ ## flag ## _  flag_stringlist ## _Flag_Register_ ## flag ## _object; \
+	END_FLAGS_NAMESPACES                                          
 
 Declare_bool(help)
 Declare_stringlist(unknown_trash)
