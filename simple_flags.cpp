@@ -71,10 +71,15 @@ INSTANTIATE_Flags_Register(flag_floatlist)
 INSTANTIATE_Flags_Register(flag_doublelist)
 INSTANTIATE_Flags_Register(flag_boollist)
 
-
+//!
+//! @brief is_true_key test wheather @code key can be treated as true
+//! @param key a pointer to a valid C-string
+//! @return if the the string pointed by @code key can be treated as true, it returns true or false.
+//! @note @code key must point to a valid C-string or the behavior is undefined.
+//! @see is_false_key
 inline bool is_true_key(const char* key)
 {
-    const char* true_keys[] = {
+    const static char* true_keys[] = {
         "true" ,
         "True" ,
         "TRUE" ,
@@ -95,9 +100,15 @@ inline bool is_true_key(const char* key)
     return false;
 }
 
+//!
+//! @brief is_false_key test wheather @code key can be treated as false
+//! @param key a pointer to a valid C-string
+//! @return if the given param @code key can be treated as false, it returns true or false
+//! @note @code key must point to a valid C-string or the behavior is undefined
+//! @see is_true_key
 inline bool is_false_key(const char* key)
 {
-    const char* false_keys[] = {
+    const static char* false_keys[] = {
         "false" ,
         "False" ,
         "FALSE" ,
@@ -119,25 +130,32 @@ inline bool is_false_key(const char* key)
     return false;
 }
 
+//!
+//! @brief str_contains tests if a C-style string contains a given char
+//! @param str a C-style string
+//! @param c a char
 inline bool str_contains(const char* str, char c)
 {
-	assert(str != NULL);
-	const char* s = str;
-	while (*s != '\0') {
-		if (*s == c) {
-			return true;
-		}
-		++s;
-	}
-	return false;
+    for (const char* s = str; *s != '\0'; ++s)
+    {
+        if (*s == c) 
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
+//!
+//! @brief is_separated_with tests if a string starts with a given string
+//! @param arg
+//! @param opt
+//! @param delimiters
 inline const char* is_separated_with(const char* arg, const char* opt, const char* delimiters)
 {
-	assert(arg != NULL && opt != NULL && delimiters != NULL);
 	const char* a = arg;
 	const char* o = opt;
-	for (;;) 
+	for (;;)
 	{
 		if (*o == '\0' && str_contains(delimiters, *a)) 
 		{
@@ -154,7 +172,6 @@ inline const char* is_separated_with(const char* arg, const char* opt, const cha
 }
 
 bool parse_flag_bool(flag_bool* ptr, const char* str) {
-    assert(ptr != NULL && str != NULL);
     if (is_true_key(str)) {
         *ptr = true;
     }
@@ -216,7 +233,7 @@ inline bool parse_flag_int64(flag_int64* ptr, const char* str) {
     char* endptr = nullptr;
     errno = 0;
     long long value = strtoll(str, &endptr, 10);
-    if (endptr == str || endptr != nullptr || errno != 0) {
+    if (endptr == str || endptr == nullptr || errno != 0) {
         return false;
     }
     *ptr = value;
@@ -235,7 +252,6 @@ inline bool parse_flag_uint64(flag_uint64* ptr, const char* str) {
 }
 
 inline bool parse_flag_string(flag_string* ptr, const char* str) {
-	assert(ptr != NULL && str != NULL);
     if (str[0] == '-')
     {
         return false;
@@ -245,7 +261,6 @@ inline bool parse_flag_string(flag_string* ptr, const char* str) {
 }
 
 inline bool parse_flag_stringlist(flag_stringlist* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     if (p[0] == '-') {
         return false;
     } else {
@@ -276,7 +291,6 @@ inline void parse_split_flag_stringlist(flag_stringlist* ptr, const char* p)
 }
 
 inline bool parse_flag_boollist(flag_boollist* ptr, const char* p) {
-	assert(p != NULL && ptr != NULL);
 	if (is_true_key(p)) {
 		ptr->push_back(true);
 	}
@@ -318,7 +332,6 @@ inline void parse_split_flag_boollist(flag_boollist* ptr, const char* p) {
 }
 
 inline bool parse_flag_floatlist(flag_floatlist* ptr, const char* p) {
-	assert(p != NULL && ptr != NULL);
     char* endptr = nullptr;
     errno = 0;
     float value = strtof(p, &endptr);
@@ -330,37 +343,29 @@ inline bool parse_flag_floatlist(flag_floatlist* ptr, const char* p) {
 }
 
 inline void parse_split_flag_floatlist(flag_boollist* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
-    char* endptr = NULL;
+    char* endptr = nullptr;
     float value = 0.0f;
-    std::string tmp;
     while (*p != '\0') {
-        do {
-            if (*p == ',') {
+        errno = 0;
+        endptr = nullptr;
+        value = strtof(p, &endptr);
+        if (errno != 0 || endptr == nullptr) {
+            do {
+                if (*p == ',') {
+                    ++p;
+                    break;
+                }
                 ++p;
-                break;
-            }
-            else {
-                tmp.push_back(*p);
-                ++p;
-            }
-        } while (*p != '\0');
-        if (!tmp.empty()) {
-            errno = 0;
-            value = strtof(p, &endptr);
-            if (errno != 0 || endptr == p || endptr == NULL) {
-                std::cout << "Warning -- Flag parse: Invalid float expression" << std::endl;
-            }
-            else {
-                ptr->push_back(value);
-            }
-            tmp.clear();
+            } while (*p != '\0');
+        }
+        else {
+            ptr->push_back(value);
+            p = endptr;
         }
     }
 }
 
 inline bool parse_flag_doublelist(flag_doublelist* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     errno = 0;
     double value = strtod(p, &endptr);
@@ -372,7 +377,6 @@ inline bool parse_flag_doublelist(flag_doublelist* ptr, const char* p) {
 }
 
 inline void parse_split_flag_doublelist(flag_doublelist* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     double value = 0.0;
     std::string tmp;
@@ -402,7 +406,6 @@ inline void parse_split_flag_doublelist(flag_doublelist* ptr, const char* p) {
 }
 
 inline bool parse_flag_int32list(flag_int32list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     errno = 0;
     long value = strtol(p, &endptr, 10);
@@ -414,7 +417,6 @@ inline bool parse_flag_int32list(flag_int32list* ptr, const char* p) {
 }
 
 inline void parse_split_flag_int32list(flag_int32list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     long value = 0;
     std::string tmp;
@@ -444,7 +446,6 @@ inline void parse_split_flag_int32list(flag_int32list* ptr, const char* p) {
 }
 
 inline bool parse_flag_uint32list(flag_uint32list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     errno = 0;
     unsigned long value = strtoul(p, &endptr, 10);
@@ -456,7 +457,6 @@ inline bool parse_flag_uint32list(flag_uint32list* ptr, const char* p) {
 }
 
 inline void parse_split_flag_uint32list(flag_uint32list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     unsigned long value = 0;
     std::string tmp;
@@ -486,7 +486,6 @@ inline void parse_split_flag_uint32list(flag_uint32list* ptr, const char* p) {
 }
 
 inline bool parse_flag_uint64list(flag_uint64list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     errno = 0;
     unsigned long value = strtoull(p, &endptr, 10);
@@ -498,7 +497,6 @@ inline bool parse_flag_uint64list(flag_uint64list* ptr, const char* p) {
 }
 
 inline void parse_split_flag_uint64list(flag_uint64list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     unsigned long long value = 0;
     std::string tmp;
@@ -528,7 +526,6 @@ inline void parse_split_flag_uint64list(flag_uint64list* ptr, const char* p) {
 }
 
 inline bool parse_flag_int64list(flag_int64list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     errno = 0;
     unsigned long value = strtoull(p, &endptr, 10);
@@ -540,7 +537,6 @@ inline bool parse_flag_int64list(flag_int64list* ptr, const char* p) {
 }
 
 inline void parse_split_flag_int64list(flag_int64list* ptr, const char* p) {
-    assert(p != NULL && ptr != NULL);
     char* endptr = NULL;
     long long value = 0;
     std::string tmp;
@@ -644,7 +640,6 @@ int parse_args(int argc, char** argv)
 		CHECK_ARGC;
 
         PARSE_LIST_TYPE(flag_stringlist);
-		CHECK_ARGC;
 
 		if (j == i)
 		{
@@ -657,10 +652,23 @@ int parse_args(int argc, char** argv)
 
 void print_args_info()
 {
-    for (std::size_t i = 0; i < get_s_flag_bool_Flags().size(); ++i)
-    {
-        std::cout << get_s_flag_bool_Flags()[i].comment << std::endl;
-    }
+
+#define PRINT_COMMON_HELP(type) do {\
+    for (std::size_t i = 0; i < get_s_## type ##_Flags().size(); ++i) { \
+        std::cout << "\t" << get_s_## type ##_Flags()[i].opt << "\t\t\t\t" << get_s_## type ##_Flags()[i].comment << std::endl; \
+    }} while(0)
+
+    std::cout << "\t--help\t\t\t\tget help information" << std::endl;
+
+    PRINT_COMMON_HELP(flag_bool);
+    PRINT_COMMON_HELP(flag_float);
+    PRINT_COMMON_HELP(flag_double);
+    PRINT_COMMON_HELP(flag_int32);
+    PRINT_COMMON_HELP(flag_uint32);
+    PRINT_COMMON_HELP(flag_int64);
+    PRINT_COMMON_HELP(flag_uint64);
+    PRINT_COMMON_HELP(flag_string);
+    PRINT_COMMON_HELP(flag_stringlist);
 }
 
 END_FLAGS_NAMESPACES

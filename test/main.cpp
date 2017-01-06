@@ -6,19 +6,20 @@ using namespace std;
 //Define_stringlist(namse, "class names")
 //Define_bool(model, false, "")
 
-Define_bool(use_model, false, "")
-Define_float(radius, 0.0f, "")
-Define_double(pie, 0.0, "")
-Define_int32(height, 0, "")
-Define_uint32(age, 0, "")
-Define_int64(time, 0, "")
-Define_uint64(lenght, 0, "")
-Define_string(name, "", "")
-Define_stringlist(set, "")
+Define_bool(use_model, false, "W")
+Define_float(radius, 0.0f, "Circle radius")
+Define_double(pie, 0.0, "PI const value")
+Define_int32(height, 0, "your height")
+Define_uint32(age, 0, "your age")
+Define_int64(time, 0, "available time")
+Define_uint64(lenght, 0, "leght of xxx")
+Define_string(name, "", "name ???")
+Define_stringlist(set, "a SET")
 
 int main(int argc, char *argv[])
 {
     Flags::parse_args(argc, argv);
+    Flags::print_args_info();
     std::cout << Flag_use_model << std::endl;
     std::cout << Flag_name << std::endl;
     std::cout << Flag_radius << std::endl;

@@ -1,3 +1,45 @@
+/**********************************************************************
+* @brief simple_flags.h
+*   This header contains macro definitions to declare and define a flag 
+* used by an application.
+*   When we write a C++ application with rich CLI, we have to write code
+* to parse argc and argv each time, that is boring.
+* The simple_flags.h and simgle_flags.cpp help to reduce the overload.
+* It is very simple to embed simple_flags into your application.
+*   First, just add simple_flags.h and simple_flags.cpp to your project's
+* source tree.
+*   Second, use Declare_* macro to delcare flags in your header files
+* your want to support in your application, but it is not mandatory.
+* you can Declare a flag wherever you want to access it.
+*   Third, use Define_* macro to define flags in your source files, this is
+* mandatory, but remember you can only Define a flag once or you will get
+* compile error.
+* Here is an example:
+* @code
+* #include "simple_flags.h"
+* #include <iostream>
+* Declare_bool(use_model)
+* Define_bool(use_model, flase, "Use user defined model")
+* int main(int argc, char** argv) {
+*     Flags::parse_args(argc, argv);
+*     if (Flag_use_model) {
+*         std::cout << "Use user defined model!" << std::endl;
+*     } else {
+*         std::cout << "Do not use user defined model!" << std::endl;
+*     }
+*     return 0
+* }
+* @code
+* ./app -use_model
+* print: Use user defined model!
+* ./app -use_model=off
+* print: Do not use user defined model!
+* So easy, aha ^_^
+* For more details about this library, see the full documentation.
+* @author linan
+* @date 2016/12
+* @address Sensetime in Beijing, China.
+***********************************************************************/
 #ifndef SIMPLE_FLAGS_H
 #define SIMPLE_FLAGS_H
 #include <stdint.h>
@@ -39,7 +81,11 @@ void registerFlag(const flag_string &opt, T* optPtr, const char* comment);
 END_FLAGS_NAMESPACES
 
 #define To_str(x) #x
+#if defined(_WIN32) || defined(_MSC_VER)
+#define Flag_To_Str(x) To_str(- ## x)
+#else
 #define Flag_To_Str(x) "-"To_str(x)
+#endif
 #define Flag_To_Str2(x) #x
 
 /*!
@@ -94,12 +140,11 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## opt {                                     \
     public:                                                                    \
         type ## _Flag_Register_ ## opt() {                                     \
-            registerFlag<type>(Flag_To_Str(opt), &Flag_ ## opt, comment); \
+            registerFlag<type>(Flag_To_Str(opt), &Flag_ ## opt, comment);      \
         }                                                                      \
     };                                                                         \
     static type ## _Flag_Register_ ## opt s_flag_ ## opt ## _object;           \
     END_FLAGS_NAMESPACES
-
 
 #define Define_ImplementerOpt(type, opt, flag, def, comment)                                 \
 	FLAGS_NAMESPACE::type flag = def;                                                        \
@@ -107,12 +152,11 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## flag {                                                  \
 	public:                                                                                  \
         type ## _Flag_Register_ ## flag() {                                                  \
-            registerFlag<type>(Flag_To_Str2(opt), &flag, comment);                            \
+            registerFlag<type>(Flag_To_Str2(opt), &flag, comment);                           \
 		}                                                                                    \
 	};                                                                                       \
     static type ## _Flag_Register_ ## flag  type ## _Flag_Register_ ## flag ## _object;      \
 	END_FLAGS_NAMESPACES
-
 
 #define Define_Implementer_list(type, opt, comment)                                          \
     FLAGS_NAMESPACE::type Flag_ ## opt;                                                      \
@@ -120,7 +164,7 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## opt {                                                   \
     public:                                                                                  \
         type ## _Flag_Register_ ## opt () {                                                  \
-            registerFlag<type>(Flag_To_Str(opt), &Flag_ ## opt, comment);               \
+            registerFlag<type>(Flag_To_Str(opt), &Flag_ ## opt, comment);                    \
         }                                                                                    \
     };                                                                                       \
     static type ## _Flag_Register_ ## opt  type ## _Flag_Register_ ## opt ## _object;        \
@@ -132,7 +176,7 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## flag {                                                  \
     public:                                                                                  \
         type ## _Flag_Register_ ## flag() {                                                  \
-            registerFlag<type>(Flag_To_Str2(opt), &flag, comment);                            \
+            registerFlag<type>(Flag_To_Str2(opt), &flag, comment);                           \
         }                                                                                    \
     };                                                                                       \
     static type ## _Flag_Register_ ## flag  type ## _Flag_Register_ ## flag ## _object;      \
