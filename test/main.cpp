@@ -1,15 +1,32 @@
 #include <iostream>
 #include "simple_flags.h"
+#include <assert.h>
 using namespace std;
 
-Define_stringlist(namse, "class names")
+//Define_stringlist(namse, "class names")
+//Define_bool(model, false, "")
+
+Define_bool(use_model, false, "")
+Define_float(radius, 0.0f, "")
+Define_double(pie, 0.0, "")
+Define_int32(height, 0, "")
+Define_uint32(age, 0, "")
+Define_int64(time, 0, "")
+Define_uint64(lenght, 0, "")
+Define_string(name, "", "")
+Define_stringlist(set, "")
 
 int main(int argc, char *argv[])
 {
     Flags::parse_args(argc, argv);
-    for (std::string s : Flag_namse) {
-        cout << s << std::endl;
-    }
+    std::cout << Flag_use_model << std::endl;
+    std::cout << Flag_name << std::endl;
+    std::cout << Flag_radius << std::endl;
+    std::cout << Flag_pie << std::endl;
+    std::cout << Flag_height << std::endl;
+    std::cout << Flag_age << std::endl;
+    std::cout << Flag_time << std::endl;
+    std::cout << Flag_set.size() << std::endl;
     return 0;
 }
 

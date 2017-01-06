@@ -38,8 +38,9 @@ void registerFlag(const flag_string &opt, T* optPtr, const char* comment);
 
 END_FLAGS_NAMESPACES
 
-#define Flag_Connect_Str(x, y) x ## y
-#define Flag_To_Str(x) #x
+#define To_str(x) #x
+#define Flag_To_Str(x) "-"To_str(x)
+#define Flag_To_Str2(x) #x
 
 /*!
   * @Common flag declaration macros
@@ -93,7 +94,7 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## opt {                                     \
     public:                                                                    \
         type ## _Flag_Register_ ## opt() {                                     \
-            registerFlag<type>(Flag_To_Str(- ## opt), &Flag_ ## opt, comment); \
+            registerFlag<type>(Flag_To_Str(opt), &Flag_ ## opt, comment); \
         }                                                                      \
     };                                                                         \
     static type ## _Flag_Register_ ## opt s_flag_ ## opt ## _object;           \
@@ -106,7 +107,7 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## flag {                                                  \
 	public:                                                                                  \
         type ## _Flag_Register_ ## flag() {                                                  \
-			registerFlag<type>(Flag_To_Str(opt), &flag, comment);                            \
+            registerFlag<type>(Flag_To_Str2(opt), &flag, comment);                            \
 		}                                                                                    \
 	};                                                                                       \
     static type ## _Flag_Register_ ## flag  type ## _Flag_Register_ ## flag ## _object;      \
@@ -119,7 +120,7 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## opt {                                                   \
     public:                                                                                  \
         type ## _Flag_Register_ ## opt () {                                                  \
-            registerFlag<type>(Flag_To_Str(- ## opt), &Flag_ ## opt, comment);               \
+            registerFlag<type>(Flag_To_Str(opt), &Flag_ ## opt, comment);               \
         }                                                                                    \
     };                                                                                       \
     static type ## _Flag_Register_ ## opt  type ## _Flag_Register_ ## opt ## _object;        \
@@ -131,7 +132,7 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## flag {                                                  \
     public:                                                                                  \
         type ## _Flag_Register_ ## flag() {                                                  \
-            registerFlag<type>(Flag_To_Str(opt), &flag, comment);                            \
+            registerFlag<type>(Flag_To_Str2(opt), &flag, comment);                            \
         }                                                                                    \
     };                                                                                       \
     static type ## _Flag_Register_ ## flag  type ## _Flag_Register_ ## flag ## _object;      \
