@@ -3,31 +3,30 @@
 #include <assert.h>
 using namespace std;
 
-//Define_stringlist(namse, "class names")
-//Define_bool(model, false, "")
-
-Define_bool(use_model, false, "W")
-Define_float(radius, 0.0f, "Circle radius")
-Define_double(pie, 0.0, "PI const value")
-Define_int32(height, 0, "your height")
-Define_uint32(age, 0, "your age")
-Define_int64(time, 0, "available time")
-Define_uint64(lenght, 0, "leght of xxx")
-Define_string(name, "", "name ???")
-Define_stringlist(set, "a SET")
+Define_bool(enabe_special, true, "Enable special version")
+Define_int32(width, 14, "Input width")
+Define_int32(height, 123, "Input height")
+Define_int32(length, 999, "Input length")
+Define_string(name, "", "name")
+Define_string(password, "", "password")
+Define_stringlist(d, "Directories")
 
 int main(int argc, char *argv[])
 {
     Flags::parse_args(argc, argv);
-    Flags::print_args_info();
-    std::cout << Flag_use_model << std::endl;
-    std::cout << Flag_name << std::endl;
-    std::cout << Flag_radius << std::endl;
-    std::cout << Flag_pie << std::endl;
+
+    std::cout << Flag_enabe_special << std::endl;
+    std::cout << Flag_width << std::endl;
     std::cout << Flag_height << std::endl;
-    std::cout << Flag_age << std::endl;
-    std::cout << Flag_time << std::endl;
-    std::cout << Flag_set.size() << std::endl;
+    std::cout << Flag_length << std::endl;
+    std::cout << Flag_d.size() << std::endl;
+    std::cout << Flag_name << std::endl;
+    std::cout << Flag_password << std::endl;
+
+    for (std::size_t i = 0; i < Flag_d.size(); ++i) {
+        std::cout << Flag_d[i] << std::endl;
+    }
+
     return 0;
 }
 
