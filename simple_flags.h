@@ -80,11 +80,18 @@ void registerFlag(const flag_string &opt, T* optPtr, const char* comment);
 
 END_FLAGS_NAMESPACES
 
+/**
+ * \brief Flag_To_Str
+ * Convert the given literal expression to literal string.
+ * \param x literal expression to be converted.
+ */
 #define Flag_To_Str(x) #x
 
-/*!
-  * @Common flag declaration macros
-  */
+/**
+ * \defgroup Single-parameter flag declaration macros
+ * Declare a option which accept only one parameter, so you can access it by using Flag_* vairable.
+ * @{
+ */
 #define Declare_bool(opt)   extern FLAGS_NAMESPACE::flag_bool   Flag_ ## opt;
 #define Declare_float(opt)  extern FLAGS_NAMESPACE::flag_float  Flag_ ## opt;
 #define Declare_double(opt) extern FLAGS_NAMESPACE::flag_double Flag_ ## opt;
@@ -94,8 +101,13 @@ END_FLAGS_NAMESPACES
 #define Declare_uint64(opt) extern FLAGS_NAMESPACE::flag_uint64 Flag_ ## opt;
 #define Declare_string(opt) extern FLAGS_NAMESPACE::flag_string Flag_ ## opt;
 
-/*!
-  * @brief list flag declaration macros
+/**
+ * @} //! Common declare macros.
+ */
+
+/**
+  * \defgroup Muti-parameter flag declaration macros
+  * Declare a option which accept parameters list, so you can access it by using Flag_* variable
   */
 #define Declare_stringlist(opt)   extern FLAGS_NAMESPACE::flag_stringlist    Flag_ ## opt;
 #define Declare_boollist(opt)     extern FLAGS_NAMESPACE::flag_boollist      Flag_ ## opt;
@@ -106,8 +118,13 @@ END_FLAGS_NAMESPACES
 #define Declare_uint32list(opt)   extern FLAGS_NAMESPACE::flag_uint32list    Flag_ ## opt;
 #define Declare_uint64list(opt)   extern FLAGS_NAMESPACE::flag_uint64list    Flag_ ## opt;
 
-/*!
-  */
+/**@}*/
+
+/**
+ * \defgroup Self-defined single-parameter flag declaration macros
+ * Declare a self-defined option which accept only one parameter, so you can access it by using Flag_* variable
+ * @{
+ */
 #define Declare_bool_opt(flag)   extern FLAGS_NAMESPACE::flag_bool   flag;
 #define Declare_float_opt(flag)  extern FLAGS_NAMESPACE::flag_float  flag;
 #define Declare_double_opt(flag) extern FLAGS_NAMESPACE::flag_double flag;
@@ -117,8 +134,13 @@ END_FLAGS_NAMESPACES
 #define Declare_uint64_opt(flag) extern FLAGS_NAMESPACE::flag_uint64 flag;
 #define Declare_string_opt(flag) extern FLAGS_NAMESPACE::flag_string flag;
 
-/*!
-  */
+/**@}*/
+
+/**
+ * \defgroup Self-defined multi-parameter flag declaration macros
+ * Declare a self-define option which accept parameter list, so you can access it by using Flag_* variable.
+ * @{
+ */
 #define Declare_stringlist_opt(flag)  extern FLAGS_NAMESPACE::flag_stringlist flag;
 #define Declare_boollist_opt(flag)    extern FLAGS_NAMESPACE::flag_boollist   flag;
 #define Declare_floatlist_opt(flag)   extern FLAGS_NAMESPACE::flag_floatlist  flag;
@@ -128,29 +150,34 @@ END_FLAGS_NAMESPACES
 #define Declare_uint32list_opt(flag)  extern FLAGS_NAMESPACE::flag_uint32list flag;
 #define Declare_uint64list_opt(flag)  extern FLAGS_NAMESPACE::flag_uint64list flag;
 
+/**@}*/
+
+/**
+ * \defgroup Define definitions
+ */
 #define Define_Implementer(type, opt, def, comment)                            \
     FLAGS_NAMESPACE::type Flag_ ## opt = def;                                  \
     BEGIN_FLAGS_NAMESPACES                                                     \
     class type ## _Flag_Register_ ## opt {                                     \
     public:                                                                    \
         type ## _Flag_Register_ ## opt() {                                     \
-            registerFlag<type>("-" Flag_To_Str(opt), &Flag_ ## opt, comment);      \
+            registerFlag<type>("-" Flag_To_Str(opt), &Flag_ ## opt, comment);  \
         }                                                                      \
     };                                                                         \
     static type ## _Flag_Register_ ## opt s_flag_ ## opt ## _object;           \
     END_FLAGS_NAMESPACES
 
 #define Define_ImplementerOpt(type, opt, flag, def, comment)                                 \
-	FLAGS_NAMESPACE::type flag = def;                                                        \
-	BEGIN_FLAGS_NAMESPACES                                                                   \
+    FLAGS_NAMESPACE::type flag = def;                                                        \
+    BEGIN_FLAGS_NAMESPACES                                                                   \
     class type ## _Flag_Register_ ## flag {                                                  \
-	public:                                                                                  \
+    public:                                                                                  \
         type ## _Flag_Register_ ## flag() {                                                  \
-            registerFlag<type>(Flag_To_Str(opt), &flag, comment);                           \
-		}                                                                                    \
-	};                                                                                       \
+            registerFlag<type>(Flag_To_Str(opt), &flag, comment);                            \
+        }                                                                                    \
+    };                                                                                       \
     static type ## _Flag_Register_ ## flag  type ## _Flag_Register_ ## flag ## _object;      \
-	END_FLAGS_NAMESPACES
+    END_FLAGS_NAMESPACES
 
 #define Define_Implementer_list(type, opt, comment)                                          \
     FLAGS_NAMESPACE::type Flag_ ## opt;                                                      \
@@ -158,7 +185,7 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## opt {                                                   \
     public:                                                                                  \
         type ## _Flag_Register_ ## opt () {                                                  \
-            registerFlag<type>("-" Flag_To_Str(opt), &Flag_ ## opt, comment);                    \
+            registerFlag<type>("-" Flag_To_Str(opt), &Flag_ ## opt, comment);                \
         }                                                                                    \
     };                                                                                       \
     static type ## _Flag_Register_ ## opt  type ## _Flag_Register_ ## opt ## _object;        \
@@ -170,12 +197,19 @@ END_FLAGS_NAMESPACES
     class type ## _Flag_Register_ ## flag {                                                  \
     public:                                                                                  \
         type ## _Flag_Register_ ## flag() {                                                  \
-            registerFlag<type>(Flag_To_Str(opt), &flag, comment);                           \
+            registerFlag<type>(Flag_To_Str(opt), &flag, comment);                            \
         }                                                                                    \
     };                                                                                       \
     static type ## _Flag_Register_ ## flag  type ## _Flag_Register_ ## flag ## _object;      \
     END_FLAGS_NAMESPACES
 
+/**@}*/
+
+/**
+ * \defgroup Single-parameter option define macros
+ * Define a option which accept only one option, so it will be parsed.
+ * @{
+ */
 #define Define_bool(opt, def, comment)   Define_Implementer(flag_bool, opt, def, comment)
 #define Define_float(opt, def, comment)  Define_Implementer(flag_float, opt, def, comment)
 #define Define_double(opt, def, comment) Define_Implementer(flag_double, opt, def, comment)
@@ -185,6 +219,13 @@ END_FLAGS_NAMESPACES
 #define Define_uint64(opt, def, comment) Define_Implementer(flag_uint64, opt, def, comment)
 #define Define_string(opt, def, comment) Define_Implementer(flag_string, opt, def, comment)
 
+/**@}*/
+
+/**
+ * \defgroup Self-define single-parameter option define macros
+ * Define self-defined optiong, so it will be parsed.
+ * @{
+*/
 #define Define_bool_opt(opt, flag, def, comment)   Define_ImplementerOpt(flag_bool, opt, flag, def, comment)
 #define Define_float_opt(opt, flag, def, comment)  Define_ImplementerOpt(flag_float, opt, flag, def, comment)
 #define Define_double_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_double, opt, flag, def, comment)
@@ -194,6 +235,14 @@ END_FLAGS_NAMESPACES
 #define Define_uint64_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_uint64, opt, flag, def, comment)
 #define Define_string_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_uint64, opt, flag, def, comment)
 
+/**@}*/
+
+
+ /**
+ * \defgroup Multi-parameter option define macros
+ * Define a option which accept parameter list, so it will be parsed.
+ * @{
+ */
 #define Define_stringlist(opt, comment) Define_Implementer_list(flag_stringlist, opt, comment)
 #define Define_boollist(opt, comment)   Define_Implementer_list(flag_boollist, opt, comment)
 #define Define_floatlist(opt, comment)  Define_Implementer_list(flag_floatlist, opt, comment)
@@ -203,6 +252,12 @@ END_FLAGS_NAMESPACES
 #define Define_int64list(opt, comment)  Define_Implementer_list(flag_int64list, opt, comment)
 #define Define_uint64list(opt, comment) Define_Implementer_list(flag_uint64list, opt, comment)
 
+/**@}*/
+
+/**
+ * \defgroup Self-define multi-parameter option define macros
+ * Define a option which accept parameter list, so it will be parsed.
+ */
 #define Define_stringlist_opt(opt, flag, comment) Define_Implementer_listOpt(flag_stringlist, opt, flag, comment)
 #define Define_int32list_opt(opt, flag, comment)  Define_Implementer_listOpt(flag_int32list, opt, flag, comment)
 #define Define_uint32list_opt(opt, flag, comment) Define_Implementer_listOpt(flag_uint32list, opt, flag, comment)
@@ -210,6 +265,8 @@ END_FLAGS_NAMESPACES
 #define Define_uint64list_opt(opt, flag, comment) Define_Implementer_listOpt(flag_uint64list, opt, flag, comment)
 #define Define_floatlist_opt(opt, flag, comment)  Define_Implementer_listOpt(flag_floatlist, opt, flag, comment)
 #define Define_doublelist_opt(opt, flag, comment) Define_Implementer_listOpt(flag_doublelist, opt, flag, comment)
+
+/**@}*/
 
 Declare_bool(help)
 Declare_stringlist(unknown_trash)

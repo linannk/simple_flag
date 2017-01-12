@@ -343,7 +343,7 @@ inline bool parse_flag_floatlist(flag_floatlist* ptr, const char* p) {
     return false;
 }
 
-inline void parse_split_flag_floatlist(flag_boollist* ptr, const char* p) {
+inline void parse_split_flag_floatlist(flag_floatlist* ptr, const char* p) {
     char* endptr = nullptr;
     float value = 0.0f;
     while (*p != '\0') {
@@ -489,7 +489,7 @@ inline void parse_split_flag_uint32list(flag_uint32list* ptr, const char* p) {
 inline bool parse_flag_uint64list(flag_uint64list* ptr, const char* p) {
     char* endptr = NULL;
     errno = 0;
-    unsigned long value = strtoull(p, &endptr, 10);
+    unsigned long long value = strtoull(p, &endptr, 10);
     if (endptr != p && errno == 0 && endptr != NULL) {
         ptr->push_back(value);
         return true;
@@ -529,7 +529,7 @@ inline void parse_split_flag_uint64list(flag_uint64list* ptr, const char* p) {
 inline bool parse_flag_int64list(flag_int64list* ptr, const char* p) {
     char* endptr = NULL;
     errno = 0;
-    unsigned long value = strtoull(p, &endptr, 10);
+    unsigned long long value = strtoull(p, &endptr, 10);
     if (endptr != p && errno == 0 && endptr != NULL) {
         ptr->push_back(value);
         return true;
