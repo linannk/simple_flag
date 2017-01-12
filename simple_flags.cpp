@@ -13,19 +13,19 @@ using std::string;
 template<typename T>
 class OptionInfo {
 public:
-	std::string opt;
-	std::string comment;
-	T* optPtr;
+    std::string opt;
+    std::string comment;
+    T* optPtr;
 };
 
 template<typename T>
 void registerFlag(const flag_string &opt, T* optPtr, std::string& comment) {}
 
 #define Implement_Flags_Register(type)                                                            \
-	static vector<OptionInfo<type>>& get_s_## type ##_Flags() {                                   \
-		static vector<OptionInfo<type>> s_ ## type ##_Flags;                                      \
-		return s_## type ## _Flags;                                                               \
-	}                                                                                             \
+    static vector<OptionInfo<type>>& get_s_## type ##_Flags() {                                   \
+        static vector<OptionInfo<type>> s_ ## type ##_Flags;                                      \
+        return s_## type ## _Flags;                                                               \
+    }                                                                                             \
     template<> void registerFlag<type>(const flag_string &opt, type* optPtr, const char* comment) \
     {                                                                                             \
         get_s_##type##_Flags().push_back(OptionInfo<type>{opt, comment, optPtr});                 \
@@ -86,11 +86,11 @@ inline bool is_true_key(const char* key)
         "on" ,
         "On" ,
         "ON" ,
-		"yes" ,
-		"Yes" ,
-		"YES"
+        "yes" ,
+        "Yes" ,
+        "YES"
     };
-    for (int i = 0; i < sizeof(true_keys) / sizeof(char*); ++i)
+    for (size_t i = 0; i < sizeof(true_keys) / sizeof(char*); ++i)
     {
         if (0 == strcmp(true_keys[i], key))
         {
@@ -115,12 +115,12 @@ inline bool is_false_key(const char* key)
         "off" ,
         "Off" ,
         "OFF" ,
-		"no" ,
-		"No" ,
-		"NO"
+        "no" ,
+        "No" ,
+        "NO"
     };
 
-    for (int i = 0; i < sizeof(false_keys) / sizeof(char*); ++i)
+    for (size_t i = 0; i < sizeof(false_keys) / sizeof(char*); ++i)
     {
         if (0 == strcmp(false_keys[i], key))
         {
@@ -138,7 +138,7 @@ inline bool str_contains(const char* str, char c)
 {
     for (const char* s = str; *s != '\0'; ++s)
     {
-        if (*s == c) 
+        if (*s == c)
         {
             return true;
         }
@@ -153,22 +153,22 @@ inline bool str_contains(const char* str, char c)
 //! @param delimiters
 inline const char* is_separated_with(const char* arg, const char* opt, const char* delimiters)
 {
-	const char* a = arg;
-	const char* o = opt;
-	for (;;)
-	{
-		if (*o == '\0' && str_contains(delimiters, *a)) 
-		{
-			return a + 1;
-		}
-		else if (*o != *a) 
-		{
-			return NULL;
-		}
-		++a;
-		++o;
-	}
-	return NULL;
+    const char* a = arg;
+    const char* o = opt;
+    for (;;)
+    {
+        if (*o == '\0' && str_contains(delimiters, *a))
+        {
+            return a + 1;
+        }
+        else if (*o != *a)
+        {
+            return NULL;
+        }
+        ++a;
+        ++o;
+    }
+    return NULL;
 }
 
 bool parse_flag_bool(flag_bool* ptr, const char* str) {
@@ -193,7 +193,7 @@ inline bool parse_flag_float(flag_float* ptr, const char* str) {
         return false;
     }
     *ptr = value;
-	return true;
+    return true;
 }
 
 inline bool parse_flag_double(flag_double* ptr, const char* str) {
@@ -256,14 +256,15 @@ inline bool parse_flag_string(flag_string* ptr, const char* str) {
     {
         return false;
     }
-	*ptr = str;
-	return true;
+    *ptr = str;
+    return true;
 }
 
 inline bool parse_flag_stringlist(flag_stringlist* ptr, const char* p) {
     if (p[0] == '-') {
         return false;
-    } else {
+    }
+    else {
         ptr->push_back(p);
         return true;
     }
@@ -272,7 +273,7 @@ inline bool parse_flag_stringlist(flag_stringlist* ptr, const char* p) {
 inline void parse_split_flag_stringlist(flag_stringlist* ptr, const char* p)
 {
     flag_string tmp;
-    while(*p != '\0') {
+    while (*p != '\0') {
         do {
             if (*p == ',') {
                 ++p;
@@ -291,44 +292,44 @@ inline void parse_split_flag_stringlist(flag_stringlist* ptr, const char* p)
 }
 
 inline bool parse_flag_boollist(flag_boollist* ptr, const char* p) {
-	if (is_true_key(p)) {
-		ptr->push_back(true);
-	}
-	else if (is_false_key(p)) {
-		ptr->push_back(false);
-	}
-	else {
-		return false;
-	}
-	return true;
+    if (is_true_key(p)) {
+        ptr->push_back(true);
+    }
+    else if (is_false_key(p)) {
+        ptr->push_back(false);
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 inline void parse_split_flag_boollist(flag_boollist* ptr, const char* p) {
-	flag_string tmp;
-	while (*p != '\0') {
-		do {
-			if (*p == ',') {
-				++p;
-				break;
-			}
-			else {
-				tmp.push_back(*p);
-				++p;
-			}
-		} while (*p != '\0');
-		if (!tmp.empty()) {
-			if (is_true_key(tmp.c_str())) {
-				ptr->push_back(true);
-			}
-			else if (is_false_key(tmp.c_str())) {
-				ptr->push_back(false);
-			}
-			else {
-				std::cout << "Warning -- Flag parse: Invalid bool expression" << std::endl;
-			}
+    flag_string tmp;
+    while (*p != '\0') {
+        do {
+            if (*p == ',') {
+                ++p;
+                break;
+            }
+            else {
+                tmp.push_back(*p);
+                ++p;
+            }
+        } while (*p != '\0');
+        if (!tmp.empty()) {
+            if (is_true_key(tmp.c_str())) {
+                ptr->push_back(true);
+            }
+            else if (is_false_key(tmp.c_str())) {
+                ptr->push_back(false);
+            }
+            else {
+                std::cout << "Warning -- Flag parse: Invalid bool expression" << std::endl;
+            }
             tmp.clear();
-		}
-	}
+        }
+    }
 }
 
 inline bool parse_flag_floatlist(flag_floatlist* ptr, const char* p) {
@@ -570,28 +571,28 @@ int parse_args(int argc, char** argv)
 
 #define CHECK_ARGC if (i >= argc) break
 #define PARSE_COMMON_TYPE(type) do { \
-	for (auto iter = get_s_ ## type ## _Flags().begin(); iter != get_s_ ## type ## _Flags().end(); ++iter) \
-	{ \
-		if (iter->opt == argv[i]) { \
-			++iRet; ++i;\
-			if (i < argc) { \
-				if (parse_ ## type(iter->optPtr, argv[i])) { \
-					++i; \
-				} \
-			} \
-			break; \
-		} \
-		else if (const char* p = is_separated_with(argv[i], iter->opt.c_str(), "-=")) \
-		{ \
+    for (auto iter = get_s_ ## type ## _Flags().begin(); iter != get_s_ ## type ## _Flags().end(); ++iter) \
+    { \
+        if (iter->opt == argv[i]) { \
+            ++iRet; ++i;\
+            if (i < argc) { \
+                if (parse_ ## type(iter->optPtr, argv[i])) { \
+                    ++i; \
+                } \
+            } \
+            break; \
+        } \
+        else if (const char* p = is_separated_with(argv[i], iter->opt.c_str(), "-=")) \
+        { \
             ++iRet; \
-			if (!parse_ ## type(iter->optPtr, p)) \
-			{ \
-				std::cout << "Warning -- Flag parse : not a valid expression: " << argv[i] << std::endl; \
-			} \
+            if (!parse_ ## type(iter->optPtr, p)) \
+            { \
+                std::cout << "Warning -- Flag parse : not a valid expression: " << argv[i] << std::endl; \
+            } \
             else { ++i; } \
-			break; \
-		} \
-	}} while(0)
+        	break; \
+        } \
+    }} while(0)
 
 #define PARSE_BOOL_TYPE(type) do { \
     for (auto iter = get_s_ ## type ## _Flags().begin(); iter != get_s_ ## type ## _Flags().end(); ++iter) \
@@ -636,41 +637,41 @@ int parse_args(int argc, char** argv)
     }} while(0)
 
     int iRet = 0;
-	int j = 0;
-	int i = 1;
+    int j = 0;
+    int i = 1;
     while (i < argc) {
-		j = i;
+        j = i;
         PARSE_BOOL_TYPE(flag_bool);
-		CHECK_ARGC;
-		
-		PARSE_COMMON_TYPE(flag_float);
-		CHECK_ARGC;
+        CHECK_ARGC;
 
-		PARSE_COMMON_TYPE(flag_double);
-		CHECK_ARGC;
+        PARSE_COMMON_TYPE(flag_float);
+        CHECK_ARGC;
 
-		PARSE_COMMON_TYPE(flag_string);
-		CHECK_ARGC;
-		
-		PARSE_COMMON_TYPE(flag_int32);
-		CHECK_ARGC;
+        PARSE_COMMON_TYPE(flag_double);
+        CHECK_ARGC;
 
-		PARSE_COMMON_TYPE(flag_uint32);
-		CHECK_ARGC;
+        PARSE_COMMON_TYPE(flag_string);
+        CHECK_ARGC;
 
-		PARSE_COMMON_TYPE(flag_int64);
-		CHECK_ARGC;
+        PARSE_COMMON_TYPE(flag_int32);
+        CHECK_ARGC;
 
-		PARSE_COMMON_TYPE(flag_uint64);
-		CHECK_ARGC;
+        PARSE_COMMON_TYPE(flag_uint32);
+        CHECK_ARGC;
+
+        PARSE_COMMON_TYPE(flag_int64);
+        CHECK_ARGC;
+
+        PARSE_COMMON_TYPE(flag_uint64);
+        CHECK_ARGC;
 
         PARSE_LIST_TYPE(flag_stringlist);
 
-		if (j == i)
-		{
-			Flag_unknown_trash.push_back(argv[i]);
-			++i;
-		}
+        if (j == i)
+        {
+            Flag_unknown_trash.push_back(argv[i]);
+            ++i;
+        }
     }
     return iRet;
 }
