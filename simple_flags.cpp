@@ -593,6 +593,31 @@ int parse_args(int argc, char** argv)
 		} \
 	}} while(0)
 
+#define PARSE_BOOL_TYPE(type) do { \
+    for (auto iter = get_s_ ## type ## _Flags().begin(); iter != get_s_ ## type ## _Flags().end(); ++iter) \
+    { \
+        if (iter->opt == argv[i]) { \
+            ++iRet; ++i;\
+            if (i < argc) { \
+                if (parse_ ## type(iter->optPtr, argv[i])) { \
+                    ++i; \
+                } \
+            } \
+            else { *iter->optPtr = !*iter->optPtr; } \
+            break; \
+        } \
+        else if (const char* p = is_separated_with(argv[i], iter->opt.c_str(), "-=")) \
+        { \
+            ++iRet; \
+            if (!parse_ ## type(iter->optPtr, p)) \
+            { \
+                std::cout << "Warning -- Flag parse : not a valid expression: " << argv[i] << std::endl; \
+            } \
+            else { ++i; } \
+            break; \
+        } \
+    }} while(0)
+
 #define PARSE_LIST_TYPE(type) do { \
     for (auto iter = get_s_ ## type ## _Flags().begin(); iter != get_s_ ## type ## _Flags().end(); ++iter) {\
         if (iter->opt == argv[i]) { \
@@ -615,7 +640,7 @@ int parse_args(int argc, char** argv)
 	int i = 1;
     while (i < argc) {
 		j = i;
-        PARSE_COMMON_TYPE(flag_bool);
+        PARSE_BOOL_TYPE(flag_bool);
 		CHECK_ARGC;
 		
 		PARSE_COMMON_TYPE(flag_float);
