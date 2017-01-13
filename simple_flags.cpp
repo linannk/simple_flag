@@ -171,7 +171,7 @@ inline const char* is_separated_with(const char* arg, const char* opt, const cha
     return NULL;
 }
 
-bool parse_flag_bool(flag_bool* ptr, const char* str) {
+inline bool parse_flag_bool(flag_bool* ptr, const char* str) {
     if (is_true_key(str)) {
         *ptr = true;
     }
@@ -475,7 +475,7 @@ inline void parse_split_flag_uint32list(flag_uint32list* ptr, const char* p) {
         if (!tmp.empty()) {
             errno = 0;
             value = strtoul(p, &endptr, 10);
-            if (errno != 0 || endptr == p && endptr != NULL) {
+            if (errno != 0 || endptr == p || endptr == NULL) {
                 std::cout << "Warning -- Flag parse: Invalid float expression" << std::endl;
             }
             else {
