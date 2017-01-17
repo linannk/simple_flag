@@ -566,9 +566,6 @@ inline void parse_split_flag_int64list(flag_int64list* ptr, const char* p) {
     }
 }
 
-int parse_args(int argc, char** argv)
-{
-
 #define CHECK_ARGC if (i >= argc) break
 #define PARSE_COMMON_TYPE(type) do { \
     for (auto iter = get_s_ ## type ## _Flags().begin(); iter != get_s_ ## type ## _Flags().end(); ++iter) \
@@ -636,11 +633,16 @@ int parse_args(int argc, char** argv)
         } \
     }} while(0)
 
+int parse_args(int argc, char** argv)
+{
+    return InitAppCmdLine(argc, argv, 0);
+}
+
+int InitAppCmdLine(int argc, char ** argv, int flags)
+{
     int iRet = 0;
-    int j = 0;
-    int i = 1;
-    while (i < argc) {
-        j = i;
+    for (int i = 0, j = 0; i < argc; j = i)
+    {
         PARSE_BOOL_TYPE(flag_bool);
         CHECK_ARGC;
 
@@ -666,38 +668,40 @@ int parse_args(int argc, char** argv)
         CHECK_ARGC;
 
         PARSE_LIST_TYPE(flag_stringlist);
+        CHECK_ARGC;
 
-        if (j == i)
+        PARSE_LIST_TYPE(flag_floatlist);
+        CHECK_ARGC;
+
+        PARSE_LIST_TYPE(flag_doublelist);
+        CHECK_ARGC;
+
+        PARSE_LIST_TYPE(flag_int32list);
+        CHECK_ARGC;
+
+        PARSE_LIST_TYPE(flag_int64list);
+        CHECK_ARGC;
+
+        PARSE_LIST_TYPE(flag_uint32list);
+        CHECK_ARGC;
+
+        PARSE_LIST_TYPE(flag_uint64list);
+        CHECK_ARGC;
+
+        if (i == j)
         {
-            Flag_unknown_trash.push_back(argv[i]);
-            ++i;
+            Flag_trash.push_back(argv[i++]);
         }
     }
     return iRet;
 }
 
-void print_args_info()
+int DumpHelpInfo()
 {
-
-#define PRINT_COMMON_HELP(type) do {\
-    for (std::size_t i = 0; i < get_s_## type ##_Flags().size(); ++i) { \
-        std::cout << "\t" << get_s_## type ##_Flags()[i].opt << "\t\t\t\t" << get_s_## type ##_Flags()[i].comment << std::endl; \
-    }} while(0)
-
-    std::cout << "\t--help\t\t\t\tget help information" << std::endl;
-
-    PRINT_COMMON_HELP(flag_bool);
-    PRINT_COMMON_HELP(flag_float);
-    PRINT_COMMON_HELP(flag_double);
-    PRINT_COMMON_HELP(flag_int32);
-    PRINT_COMMON_HELP(flag_uint32);
-    PRINT_COMMON_HELP(flag_int64);
-    PRINT_COMMON_HELP(flag_uint64);
-    PRINT_COMMON_HELP(flag_string);
-    PRINT_COMMON_HELP(flag_stringlist);
+    return 0;
 }
 
 END_FLAGS_NAMESPACES
 
-Define_bool_opt(--help, Flag_help, false, "Show these help information")
-FLAGS_NAMESPACE::flag_stringlist Flag_unknown_trash;
+Define_bool_opt(--help, Flag_help, false, "Dump application command line help information")
+FLAGS_NAMESPACE::flag_stringlist Flag_trash;

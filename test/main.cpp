@@ -13,7 +13,14 @@ Define_stringlist(d, "Directories")
 
 int main(int argc, char *argv[])
 {
-    Flags::parse_args(argc, argv);
+
+    char* args[] = {
+        "app",
+        "--help",
+        "-width=899"
+    };
+
+    Flags::parse_args(3, args);
 
     std::cout << Flag_enabe_special << std::endl;
     std::cout << Flag_width << std::endl;

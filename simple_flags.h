@@ -46,6 +46,8 @@
 #include <vector>
 #include <string>
 
+#define FLAG_REMOVE_FLAGS 0x01
+
 #define FLAGS_NAMESPACE Flags
 #define BEGIN_FLAGS_NAMESPACES namespace FLAGS_NAMESPACE {
 #define END_FLAGS_NAMESPACES }
@@ -72,8 +74,16 @@ typedef std::vector<flag_uint16> flag_uint16list;
 typedef std::vector<flag_uint32> flag_uint32list;
 typedef std::vector<flag_uint64> flag_uint64list;
 
+/**
+ * \brief parse_args
+ * Parse application's command line
+ * \remark This interface is deprecated, please use InitAppCmdLine
+ * \sa InitAppCmdLine
+ */
 int parse_args(int argc, char** argv);
-void print_args_info();
+
+int InitAppCmdLine(int argc, char** argv, int flags = 0);
+int DumpHelpInfo();
 
 template<typename T>
 void registerFlag(const flag_string &opt, T* optPtr, const char* comment);
@@ -225,7 +235,7 @@ END_FLAGS_NAMESPACES
  * \defgroup Self-define single-parameter option define macros
  * Define self-defined optiong, so it will be parsed.
  * @{
-*/
+ */
 #define Define_bool_opt(opt, flag, def, comment)   Define_ImplementerOpt(flag_bool, opt, flag, def, comment)
 #define Define_float_opt(opt, flag, def, comment)  Define_ImplementerOpt(flag_float, opt, flag, def, comment)
 #define Define_double_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_double, opt, flag, def, comment)
@@ -233,7 +243,7 @@ END_FLAGS_NAMESPACES
 #define Define_uint32_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_uint32, opt, flag, def, comment)
 #define Define_int64_opt(opt, flag, def, comment)  Define_ImplementerOpt(flag_int64, opt, flag, def, comment)
 #define Define_uint64_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_uint64, opt, flag, def, comment)
-#define Define_string_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_uint64, opt, flag, def, comment)
+#define Define_string_opt(opt, flag, def, comment) Define_ImplementerOpt(flag_string, opt, flag, def, comment)
 
 /**@}*/
 
@@ -269,6 +279,6 @@ END_FLAGS_NAMESPACES
 /**@}*/
 
 Declare_bool(help)
-Declare_stringlist(unknown_trash)
+Declare_stringlist(trash)
 #endif // SIMPLE_FLAGS_H
 
