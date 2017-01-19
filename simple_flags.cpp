@@ -1,3 +1,7 @@
+/*!
+ * \file simple_flags.cpp
+ * \brief This file contains implementation of simple_flags
+ */
 #include "simple_flags.h"
 #include <string.h>
 #include <assert.h>
@@ -6,16 +10,34 @@
 #include <iostream>
 #include <string>
 
+/*!
+ * \namespace Flags
+ * \brief simple_flags namespace.
+ *  In this Flags, we implement some function necessary to implement simple_flags.
+ */
+
 BEGIN_FLAGS_NAMESPACES
 using std::vector;
 using std::string;
 
+/*!
+ * \class OptionInfo
+ * \brief OptionInfo is a template class, it contains information about an option.
+ * \note This class is used internally. If you want change the implementation or add
+ *  more information, you can change this structure.
+ */
 template<typename T>
 class OptionInfo {
 public:
-    std::string opt;
-    std::string comment;
-    T* optPtr;
+    OptionInfo(const std::string &opt, const std::string &comment, T* optPtr)
+        : opt(opt)
+        , comment(comment)
+        , optPtr(optPtr)
+    { }
+
+    std::string opt; //!< Option to be parsed
+    std::string comment; //!< Option's comment
+    T* optPtr; //!< Pointer to option variable.
 };
 
 template<typename T>
@@ -28,7 +50,7 @@ void registerFlag(const flag_string &opt, T* optPtr, std::string& comment) {}
     }                                                                                             \
     template<> void registerFlag<type>(const flag_string &opt, type* optPtr, const char* comment) \
     {                                                                                             \
-        get_s_##type##_Flags().push_back(OptionInfo<type>{opt, comment, optPtr});                 \
+        get_s_##type##_Flags().push_back(OptionInfo<type>(opt, comment, optPtr));                 \
     }
 
 Implement_Flags_Register(flag_bool)
@@ -189,7 +211,7 @@ inline bool parse_flag_float(flag_float* ptr, const char* str) {
     char* endptr = nullptr;
     errno = 0;
     float value = strtof(str, &endptr);
-    if (endptr == str || endptr == nullptr || errno != 0) {
+    if (endptr == str || errno != 0) {
         return false;
     }
     *ptr = value;
@@ -200,7 +222,7 @@ inline bool parse_flag_double(flag_double* ptr, const char* str) {
     char* endptr = nullptr;
     errno = 0;
     double value = strtod(str, &endptr);
-    if (endptr == str || endptr == nullptr || errno != 0) {
+    if (endptr == str || errno != 0) {
         return false;
     }
     *ptr = value;
@@ -211,7 +233,7 @@ inline bool parse_flag_int32(flag_int32* ptr, const char* str) {
     char* endptr = nullptr;
     errno = 0;
     long value = strtol(str, &endptr, 10);
-    if (endptr == str || endptr == nullptr || errno != 0) {
+    if (endptr == str || errno != 0) {
         return false;
     }
     *ptr = value;
@@ -222,7 +244,7 @@ inline bool parse_flag_uint32(flag_uint32* ptr, const char* str) {
     char* endptr = nullptr;
     errno = 0;
     unsigned long value = strtoul(str, &endptr, 10);
-    if (endptr == str || endptr == nullptr || errno != 0) {
+    if (endptr == str || errno != 0) {
         return false;
     }
     *ptr = value;
@@ -233,7 +255,7 @@ inline bool parse_flag_int64(flag_int64* ptr, const char* str) {
     char* endptr = nullptr;
     errno = 0;
     long long value = strtoll(str, &endptr, 10);
-    if (endptr == str || endptr == nullptr || errno != 0) {
+    if (endptr == str || errno != 0) {
         return false;
     }
     *ptr = value;
@@ -244,7 +266,7 @@ inline bool parse_flag_uint64(flag_uint64* ptr, const char* str) {
     char* endptr = nullptr;
     errno = 0;
     unsigned long long value = strtoull(str, &endptr, 10);
-    if (endptr == str || endptr == nullptr || errno != 0) {
+    if (endptr == str || errno != 0) {
         return false;
     }
     *ptr = value;
@@ -336,7 +358,7 @@ inline bool parse_flag_floatlist(flag_floatlist* ptr, const char* p) {
     char* endptr = nullptr;
     errno = 0;
     float value = strtof(p, &endptr);
-    if (endptr != p && errno == 0 && endptr != nullptr) {
+    if (endptr != p && errno == 0) {
         ptr->push_back(value);
         return true;
     }
@@ -348,9 +370,8 @@ inline void parse_split_flag_floatlist(flag_floatlist* ptr, const char* p) {
     float value = 0.0f;
     while (*p != '\0') {
         errno = 0;
-        endptr = nullptr;
         value = strtof(p, &endptr);
-        if (errno != 0 || endptr == nullptr) {
+        if (errno != 0 || endptr == p) {
             do {
                 if (*p == ',') {
                     ++p;
@@ -380,28 +401,21 @@ inline bool parse_flag_doublelist(flag_doublelist* ptr, const char* p) {
 inline void parse_split_flag_doublelist(flag_doublelist* ptr, const char* p) {
     char* endptr = NULL;
     double value = 0.0;
-    std::string tmp;
     while (*p != '\0') {
-        do {
-            if (*p == ',') {
+        errno = 0;
+        value = strtod(p, &endptr);
+        if (errno != 0 || endptr == p) {
+            do {
+                if (*p == ',') {
+                    ++p;
+                    break;
+                }
                 ++p;
-                break;
-            }
-            else {
-                tmp.push_back(*p);
-                ++p;
-            }
-        } while (*p != '\0');
-        if (!tmp.empty()) {
-            errno = 0;
-            value = strtod(p, &endptr);
-            if (errno != 0 || endptr == p || endptr == NULL) {
-                std::cout << "Warning -- Flag parse: Invalid float expression" << std::endl;
-            }
-            else {
-                ptr->push_back(value);
-            }
-            tmp.clear();
+            } while (*p != '\0');
+        }
+        else {
+            ptr->push_back(value);
+            p = endptr;
         }
     }
 }
@@ -410,7 +424,7 @@ inline bool parse_flag_int32list(flag_int32list* ptr, const char* p) {
     char* endptr = NULL;
     errno = 0;
     long value = strtol(p, &endptr, 10);
-    if (endptr != p && errno == 0 && endptr != NULL) {
+    if (endptr != p && errno == 0) {
         ptr->push_back(value);
         return true;
     }
@@ -420,28 +434,22 @@ inline bool parse_flag_int32list(flag_int32list* ptr, const char* p) {
 inline void parse_split_flag_int32list(flag_int32list* ptr, const char* p) {
     char* endptr = NULL;
     long value = 0;
-    std::string tmp;
     while (*p != '\0') {
-        do {
-            if (*p == ',') {
+        errno = 0;
+        endptr = nullptr;
+        value = strtol(p, &endptr, 10);
+        if (errno != 0 || endptr == p) {
+            do {
+                if (*p == ',') {
+                    ++p;
+                    break;
+                }
                 ++p;
-                break;
-            }
-            else {
-                tmp.push_back(*p);
-                ++p;
-            }
-        } while (*p != '\0');
-        if (!tmp.empty()) {
-            errno = 0;
-            value = strtol(p, &endptr, 10);
-            if (errno != 0 || endptr == p) {
-                std::cout << "Warning -- Flag parse: Invalid float expression" << std::endl;
-            }
-            else {
-                ptr->push_back(value);
-            }
-            tmp.clear();
+            } while (*p != '\0');
+        }
+        else {
+            ptr->push_back(value);
+            p = endptr;
         }
     }
 }
@@ -450,7 +458,7 @@ inline bool parse_flag_uint32list(flag_uint32list* ptr, const char* p) {
     char* endptr = NULL;
     errno = 0;
     unsigned long value = strtoul(p, &endptr, 10);
-    if (endptr != p && errno == 0 && endptr != NULL) {
+    if (endptr != p && errno == 0) {
         ptr->push_back(value);
         return true;
     }
@@ -460,28 +468,22 @@ inline bool parse_flag_uint32list(flag_uint32list* ptr, const char* p) {
 inline void parse_split_flag_uint32list(flag_uint32list* ptr, const char* p) {
     char* endptr = NULL;
     unsigned long value = 0;
-    std::string tmp;
     while (*p != '\0') {
-        do {
-            if (*p == ',') {
+        errno = 0;
+        endptr = nullptr;
+        value = strtoul(p, &endptr, 10);
+        if (errno != 0 || endptr == nullptr) {
+            do {
+                if (*p == ',') {
+                    ++p;
+                    break;
+                }
                 ++p;
-                break;
-            }
-            else {
-                tmp.push_back(*p);
-                ++p;
-            }
-        } while (*p != '\0');
-        if (!tmp.empty()) {
-            errno = 0;
-            value = strtoul(p, &endptr, 10);
-            if (errno != 0 || endptr == p || endptr == NULL) {
-                std::cout << "Warning -- Flag parse: Invalid float expression" << std::endl;
-            }
-            else {
-                ptr->push_back(value);
-            }
-            tmp.clear();
+            } while (*p != '\0');
+        }
+        else {
+            ptr->push_back(value);
+            p = endptr;
         }
     }
 }
@@ -490,7 +492,7 @@ inline bool parse_flag_uint64list(flag_uint64list* ptr, const char* p) {
     char* endptr = NULL;
     errno = 0;
     unsigned long long value = strtoull(p, &endptr, 10);
-    if (endptr != p && errno == 0 && endptr != NULL) {
+    if (endptr != p && errno == 0) {
         ptr->push_back(value);
         return true;
     }
@@ -500,28 +502,22 @@ inline bool parse_flag_uint64list(flag_uint64list* ptr, const char* p) {
 inline void parse_split_flag_uint64list(flag_uint64list* ptr, const char* p) {
     char* endptr = NULL;
     unsigned long long value = 0;
-    std::string tmp;
     while (*p != '\0') {
-        do {
-            if (*p == ',') {
+        errno = 0;
+        endptr = nullptr;
+        value = strtoull(p, &endptr, 10);
+        if (errno != 0 || endptr == p) {
+            do {
+                if (*p == ',') {
+                    ++p;
+                    break;
+                }
                 ++p;
-                break;
-            }
-            else {
-                tmp.push_back(*p);
-                ++p;
-            }
-        } while (*p != '\0');
-        if (!tmp.empty()) {
-            errno = 0;
-            value = strtoull(p, &endptr, 10);
-            if (errno != 0 || endptr == p && endptr != NULL) {
-                std::cout << "Warning -- Flag parse: Invalid float expression" << std::endl;
-            }
-            else {
-                ptr->push_back(value);
-            }
-            tmp.clear();
+            } while (*p != '\0');
+        }
+        else {
+            ptr->push_back(value);
+            p = endptr;
         }
     }
 }
@@ -530,7 +526,7 @@ inline bool parse_flag_int64list(flag_int64list* ptr, const char* p) {
     char* endptr = NULL;
     errno = 0;
     unsigned long long value = strtoull(p, &endptr, 10);
-    if (endptr != p && errno == 0 && endptr != NULL) {
+    if (endptr != p && errno == 0) {
         ptr->push_back(value);
         return true;
     }
@@ -540,28 +536,22 @@ inline bool parse_flag_int64list(flag_int64list* ptr, const char* p) {
 inline void parse_split_flag_int64list(flag_int64list* ptr, const char* p) {
     char* endptr = NULL;
     long long value = 0;
-    std::string tmp;
     while (*p != '\0') {
-        do {
-            if (*p == ',') {
+        errno = 0;
+        endptr = NULL;
+        value = strtoll(p, &endptr, 10);
+        if (errno != 0 || endptr == p) {
+            do {
+                if (*p == ',') {
+                    ++p;
+                    break;
+                }
                 ++p;
-                break;
-            }
-            else {
-                tmp.push_back(*p);
-                ++p;
-            }
-        } while (*p != '\0');
-        if (!tmp.empty()) {
-            errno = 0;
-            value = strtoll(p, &endptr, 10);
-            if (errno != 0 || endptr == p || endptr == NULL) {
-                std::cout << "Warning -- Flag parse: Invalid float expression" << std::endl;
-            }
-            else {
-                ptr->push_back(value);
-            }
-            tmp.clear();
+            } while (*p != '\0');
+        }
+        else {
+            ptr->push_back(value);
+            p = endptr;
         }
     }
 }
