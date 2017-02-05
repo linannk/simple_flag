@@ -686,9 +686,60 @@ int InitAppCmdLine(int argc, char ** argv, int flags)
     return iRet;
 }
 
-int DumpHelpInfo()
+static void print_spaces(int len, std::ostream& os)
 {
-    return 0;
+    for (int i = 0; i < len; ++i) 
+    {
+        os << ' ';
+    }
+}
+
+void DumpHelpInfo(std::ostream& os)
+{
+    std::size_t max_len = 0;
+#define CALC_HELP_MAX_LEN(type) do {\
+    for (const auto& info: get_s_##type##_Flags()) \
+    { \
+        max_len = info.opt.size() > max_len ? info.opt.size() : max_len; \
+    }} while(0)
+
+#define DUMP_HELP_INFO(type) do { \
+    for (const auto& info: get_s_##type##_Flags()) \
+    { \
+        os << "  " << info.opt; \
+        print_spaces(max_len - info.opt.size() + 4, os); \
+        os << info.comment << std::endl;\
+    }} while(0)
+
+    CALC_HELP_MAX_LEN(flag_bool);
+    CALC_HELP_MAX_LEN(flag_float);
+    CALC_HELP_MAX_LEN(flag_double);
+    CALC_HELP_MAX_LEN(flag_int32);
+    CALC_HELP_MAX_LEN(flag_int64);
+    CALC_HELP_MAX_LEN(flag_uint32);
+    CALC_HELP_MAX_LEN(flag_uint64);
+    CALC_HELP_MAX_LEN(flag_boollist);
+    CALC_HELP_MAX_LEN(flag_floatlist);
+    CALC_HELP_MAX_LEN(flag_doublelist);
+    CALC_HELP_MAX_LEN(flag_int32list);
+    CALC_HELP_MAX_LEN(flag_int64list);
+    CALC_HELP_MAX_LEN(flag_uint32list);
+    CALC_HELP_MAX_LEN(flag_uint64list);
+
+    DUMP_HELP_INFO(flag_bool);
+    DUMP_HELP_INFO(flag_float);
+    DUMP_HELP_INFO(flag_double);
+    DUMP_HELP_INFO(flag_int32);
+    DUMP_HELP_INFO(flag_int64);
+    DUMP_HELP_INFO(flag_uint32);
+    DUMP_HELP_INFO(flag_uint64);
+    DUMP_HELP_INFO(flag_boollist);
+    DUMP_HELP_INFO(flag_floatlist);
+    DUMP_HELP_INFO(flag_doublelist);
+    DUMP_HELP_INFO(flag_int32list);
+    DUMP_HELP_INFO(flag_int64list);
+    DUMP_HELP_INFO(flag_uint32list);
+    DUMP_HELP_INFO(flag_uint64list);
 }
 
 END_FLAGS_NAMESPACES

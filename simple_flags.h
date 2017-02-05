@@ -82,8 +82,17 @@ typedef std::vector<flag_uint64> flag_uint64list;
  */
 int parse_args(int argc, char** argv);
 
+/**
+ * \brief InitAppCmdLine
+ * Parse application's command line
+ */
 int InitAppCmdLine(int argc, char** argv, int flags = 0);
-int DumpHelpInfo();
+
+/**
+ * \brief DumpHelpInfo
+ * Print help information
+ */
+void DumpHelpInfo(std::ostream& os);
 
 template<typename T>
 void registerFlag(const flag_string &opt, T* optPtr, const char* comment);
