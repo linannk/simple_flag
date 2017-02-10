@@ -631,7 +631,7 @@ int parse_args(int argc, char** argv)
 int InitAppCmdLine(int argc, char ** argv, int flags)
 {
     int iRet = 0;
-    for (int i = 0, j = 0; i < argc; j = i)
+    for (int i = 1, j = 1; i < argc; j = i)
     {
         PARSE_BOOL_TYPE(flag_bool);
         CHECK_ARGC;
@@ -718,6 +718,7 @@ void DumpHelpInfo(std::ostream& os)
     CALC_HELP_MAX_LEN(flag_int64);
     CALC_HELP_MAX_LEN(flag_uint32);
     CALC_HELP_MAX_LEN(flag_uint64);
+    CALC_HELP_MAX_LEN(flag_string);
     CALC_HELP_MAX_LEN(flag_boollist);
     CALC_HELP_MAX_LEN(flag_floatlist);
     CALC_HELP_MAX_LEN(flag_doublelist);
@@ -733,6 +734,7 @@ void DumpHelpInfo(std::ostream& os)
     DUMP_HELP_INFO(flag_int64);
     DUMP_HELP_INFO(flag_uint32);
     DUMP_HELP_INFO(flag_uint64);
+    DUMP_HELP_INFO(flag_string);
     DUMP_HELP_INFO(flag_boollist);
     DUMP_HELP_INFO(flag_floatlist);
     DUMP_HELP_INFO(flag_doublelist);
